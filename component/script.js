@@ -2,18 +2,23 @@
 
 
 class Table extends HTMLElement {
-    constructor() {
-        super();
-        this.table_cfg = {
-            occupied: false,
-        }
-        this.attachShadow({ mode: 'open' });
-        this.template = document.createElement('template');
-        this.template.innerHTML = `
-        <head>
-        <!-- Awesome Fonts -->
-            <link href='https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' integrity='sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN' crossorigin='anonymous'>
-        </head>
+  constructor() {
+    super();
+    this.table_cfg = {
+      occupied: false,
+    }
+    this.attachShadow({ mode: 'open' });
+    this.template = document.createElement('template');
+    this.template.innerHTML = `
+                <head>
+                <!-- Awesome Fonts -->
+                <link
+                  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+                  rel="stylesheet"
+                  integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+                  crossorigin="anonymous"
+                />
+                </head>
                 <style>    
                     .table-content{
                         margin:3px;
@@ -24,10 +29,19 @@ class Table extends HTMLElement {
                         border-radius:5px;
                     }
                     .table-botonera{
-                        width:100%;
-                        height:30%;
-                        display:flex;
-                        flex-direction:row;
+                      width:100%;
+                      height:30%;
+                      display: flex;
+                      justify-content: center;
+                      /* align-self: center;    <---- REMOVE */
+                      align-items: center;   /* <---- NEW    */
+                      // background: silver;
+                    }
+                    .table-botonera>span{
+                      margin:5px;
+                    }
+                    .table-botonera>span>i{
+                      font-size:1.5rem;
                     }
                     
                     .occupied{
@@ -109,44 +123,55 @@ class Table extends HTMLElement {
                 </style>
                 <div class="table-content">
                     <div class="table-botonera">
-                        <span class="${(this.table_cfg.occupied == true) ? 'occupied' : 'free'}"></span>
+                        <span id="table-status" class="${(this.table_cfg.occupied == true) ? 'occupied' : 'free'}"></span>
                         <!-- Rounded switch -->
                         <label class="switch">
                           <input type="checkbox" id="change_table_status">
                           <span class="slider round"></span>
                         </label>
+                        <span>
+                          <i class="fa fa-search" aria-hidden="true"></i>
+                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        </span>
                     </div>
                 </div>
             `;
-    }
+    this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+  }
 
-    static get observedAttributes() {
-        return [''];
-    }
-    table_status_changed(){
-      this.table_cfg.occupied!=this.table_cfg.occupied;
-      
-    }
-    connectedCallback() {
-        this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-        this.shadowRoot.querySelector("#change_table_status").addEventListener('click',(ev)=>{
-          this.table_status_changed();
-        })
-    }
+  static get observedAttributes() {
+    return ['table-status'];
+  }
+  connectedCallback() {
+    this.shadowRoot.querySelector("#change_table_status").addEventListener('click', (ev) => {
+      this.table_cfg.occupied = !this.table_cfg.occupied;
 
-    attributeChangedCallback(name, oldVal, newVal) {
-    }
+      this.shadowRoot.querySelector("#table-status").className = (this.table_cfg.occupied == true) ? 'occupied' : 'free';
+
+
+    })
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    console.log(name);
+  }
+
+
 }
 
 
 
 
+
 class Restaurant extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.template = document.createElement('template');
-        this.template.innerHTML = `
+  constructor() {
+    super();
+    this.restaurant_config = {
+      'tables': '',
+    }
+    this.attachShadow({ mode: 'open' });
+    this.template = document.createElement('template');
+    this.template.innerHTML = `
        
                 <style>    
                 .restaurant-container{
@@ -175,35 +200,25 @@ class Restaurant extends HTMLElement {
                 </div>
 
 
-
-
-
-
-
-
             </div>
             `;
-    }
+    this.test_tables();
+  }
 
-    static get observedAttributes() {
-        return [''];
+  static get observedAttributes() {
+    return [''];
+  }
+  test_tables() {
+    for (let i of [...Array(3).keys()]) {
+      this.restaurant_config.tables += '<table-wc table-status=false ></table-wc>';
     }
+  }
 
-    connectedCallback() {
-        this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-        for (let i of [...Array(10).keys()]) {
-            this.shadowRoot.querySelector('.content').innerHTML += '<table-wc></table-wc>';
-        }
-    }
-
-    attributeChangedCallback(name, oldVal, newVal) {
-    }
+  connectedCallback() {
+    this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+    this.shadowRoot.querySelector('.content').innerHTML = this.restaurant_config.tables;
+  }
 }
-
-
-
-
-// Register Components
 
 customElements.define('table-wc', Table);
 customElements.define('restaurant-wc', Restaurant);

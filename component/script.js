@@ -1,16 +1,17 @@
 
 
-
 class Table extends HTMLElement {
   constructor() {
     super();
+
+    // console.log( Math.random().toString(36).substring(7));
+    this.setAttribute('table-status', false);
+    this.setAttribute('table-id', Math.random().toString(36).substring(7));
+    this.attachShadow({ mode: 'open' });
     this.table_cfg = {
       occupied: false,
-      table_id :this.getAttribute('table-id'),
+      table_id: this.getAttribute('table-id'),
     }
-    this.setAttribute('table-status',false);
-    this.setAttribute('table-id', Math.random().toString(36).substring(7)); 
-    this.attachShadow({ mode: 'open' });
     this.template = document.createElement('template');
     this.template.innerHTML = `
                 <head>
@@ -142,13 +143,16 @@ class Table extends HTMLElement {
             `;
     this.shadowRoot.appendChild(this.template.content.cloneNode(true));
 
-
-    this.checkEvent = new CustomEvent("close_table", {
-      bubbles: true,
-      cancelable: false,
-      composed: true,
-      table_id: this.table_cfg.table_id,
-    });
+    this.table_events = {
+      'close_table': new CustomEvent("close_table", {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+        detail: {
+          'table_id': this.table_cfg.table_id,
+        }
+      })
+    }
 
 
   }
@@ -157,6 +161,7 @@ class Table extends HTMLElement {
     return ['table-status'];
   }
   connectedCallback() {
+
     this.shadowRoot.querySelector("#change_table_status").addEventListener('click', (ev) => {
       this.table_cfg.occupied = !this.table_cfg.occupied;
 
@@ -168,10 +173,11 @@ class Table extends HTMLElement {
       console.log("CLICK EN TRASH ICON!");
       // console.log(this.getAttribute('table-id'))
       // Emitir el evento.
-      this.dispatchEvent(this.checkEvent);
-  
+      this.dispatchEvent(this.table_events.close_table);
+
 
     })
+
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -249,13 +255,14 @@ class Restaurant extends HTMLElement {
                     <div class="content">
 
                
-                
+                    </div>
                     
                 </div>
 
 
             </div>
             `;
+            this.shadowRoot.appendChild(this.template.content.cloneNode(true));
     this.test_tables();
   }
 
@@ -263,46 +270,41 @@ class Restaurant extends HTMLElement {
     return ['tables-count'];
   }
   test_tables() {
-    for (let i of [...Array(parseInt(this.getAttribute('tables-count'),10)).keys()]) {
+    for (let i of [...Array(parseInt(this.getAttribute('tables-count'), 10)).keys()]) {
       this.restaurant_config.tables.push(new Table());
     }
   }
 
-  render(){
-    this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-    this.shadowRoot.querySelector('.content').innerHTML ='';
-    for(let i of this.restaurant_config.tables){
+  render() {
+    // this.shadowRoot.querySelector('.botonera1').innerHTML ='';
+    this.shadowRoot.querySelector('.content').innerHTML = '';
+    for (let i of this.restaurant_config.tables) {
       this.shadowRoot.querySelector('.content').appendChild(i);
-  
+
     }
 
   }
   connectedCallback() {
     this.render();
-    this.shadowRoot.querySelector('#nueva_mesa').addEventListener('click',(ev)=>{
+    this.shadowRoot.querySelector('#nueva_mesa').addEventListener('click', (ev) => {
       this.restaurant_config.tables.push(new Table());
       this.render();
-      
+
     })
     this.addEventListener("close_table", function (e) {
-      console.log('listend to check event');
-      let table_id = e.originalTarget.getAttribute('table-id');
-      for(let i of this.restaurant_config.tables){
-        if(i.getAttribute('table-id')==table_id){
-            let indx = this.restaurant_config.tables.indexOf(i);
-            this.restaurant_config.tables.splice(indx,1);
-            console.log('tamaño del las mesaa', this.restaurant_config.tables.length);
-            console.log(this.restaurant_config.tables.length);
-            // this.setAttribute('tables-count', this.restaurant_config.tables.lenght);
+      console.log('listend to a table event!');
+      let del_req = e.detail.table_id;
+      for (let i of this.restaurant_config.tables) {
+        if (i.getAttribute('table-id') == del_req) {
+          this.restaurant_config.tables.splice(this.restaurant_config.tables.indexOf(i), 1);
+          this.render();
         }
-
       }
-      console.log(this.restaurant_config.tables);
-  });
+
+    });
   }
   attributeChangedCallback(name, oldVal, newVal) {
-    console.log(name);
-    console.log(this.getAttribute('tables-count'))
+
   }
 
 }

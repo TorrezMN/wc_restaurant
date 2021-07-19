@@ -6,7 +6,10 @@ class Table extends HTMLElement {
     super();
     this.table_cfg = {
       occupied: false,
+      table_id :this.getAttribute('table-id'),
     }
+    this.setAttribute('table-status',false);
+    this.setAttribute('table-id', Math.random().toString(36).substring(7)); 
     this.attachShadow({ mode: 'open' });
     this.template = document.createElement('template');
     this.template.innerHTML = `
@@ -42,6 +45,7 @@ class Table extends HTMLElement {
                     }
                     .table-botonera>span>i{
                       font-size:1.5rem;
+                      cursor:pointer;
                     }
                     
                     .occupied{
@@ -137,6 +141,16 @@ class Table extends HTMLElement {
                 </div>
             `;
     this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+
+
+    this.checkEvent = new CustomEvent("close_table", {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      table_id: this.table_cfg.table_id,
+    });
+
+
   }
 
   static get observedAttributes() {
@@ -150,10 +164,18 @@ class Table extends HTMLElement {
 
 
     })
+    this.shadowRoot.querySelector(".fa-trash").addEventListener('click', (ev) => {
+      console.log("CLICK EN TRASH ICON!");
+      // console.log(this.getAttribute('table-id'))
+      // Emitir el evento.
+      this.dispatchEvent(this.checkEvent);
+  
+
+    })
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
-    console.log(name);
+
   }
 
 
@@ -167,12 +189,21 @@ class Restaurant extends HTMLElement {
   constructor() {
     super();
     this.restaurant_config = {
-      'tables': '',
+      'tables': [],
+
     }
     this.attachShadow({ mode: 'open' });
     this.template = document.createElement('template');
     this.template.innerHTML = `
-       
+    <head>
+    <!-- Awesome Fonts -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    </head>
                 <style>    
                 .restaurant-container{
                     display:flex;
@@ -182,6 +213,19 @@ class Restaurant extends HTMLElement {
                 .botonera1{
                     width:20%;
                     background:red;
+                    display:flex;
+                    flex-direction:column;
+                    padding:5px;
+                    cursor: pointer;
+
+                  }
+                  .botonera_item{
+                  padding:35px;
+
+                }
+                .botonera_item:hover{
+                  background:black;
+                  color:white;
                 }
                 .content{
                     display:flex;
@@ -191,7 +235,17 @@ class Restaurant extends HTMLElement {
                 }
                 </style>
                 <div class="restaurant-container">
-                    <div class="botonera1"></div>
+                    <div class="botonera1">
+                      <div class="botonera_item" id="nueva_mesa">
+                        <i class="fa fa-plus"></i> <span class="item_title">Nueva Mesa</span>
+                      </div>
+                      <div class="botonera_item">
+                        <i class="fa fa-users"></i> <span class="item_title">Meseros</span>
+                      </div>
+                      <div class="botonera_item">
+                        <i class="fa fa-table"></i> <span class="item_title">Mesas</span>
+                      </div>
+                    </div>
                     <div class="content">
 
                
@@ -206,18 +260,51 @@ class Restaurant extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return [''];
+    return ['tables-count'];
   }
   test_tables() {
-    for (let i of [...Array(3).keys()]) {
-      this.restaurant_config.tables += '<table-wc table-status=false ></table-wc>';
+    for (let i of [...Array(parseInt(this.getAttribute('tables-count'),10)).keys()]) {
+      this.restaurant_config.tables.push(new Table());
     }
   }
 
-  connectedCallback() {
+  render(){
     this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-    this.shadowRoot.querySelector('.content').innerHTML = this.restaurant_config.tables;
+    this.shadowRoot.querySelector('.content').innerHTML ='';
+    for(let i of this.restaurant_config.tables){
+      this.shadowRoot.querySelector('.content').appendChild(i);
+  
+    }
+
   }
+  connectedCallback() {
+    this.render();
+    this.shadowRoot.querySelector('#nueva_mesa').addEventListener('click',(ev)=>{
+      this.restaurant_config.tables.push(new Table());
+      this.render();
+      
+    })
+    this.addEventListener("close_table", function (e) {
+      console.log('listend to check event');
+      let table_id = e.originalTarget.getAttribute('table-id');
+      for(let i of this.restaurant_config.tables){
+        if(i.getAttribute('table-id')==table_id){
+            let indx = this.restaurant_config.tables.indexOf(i);
+            this.restaurant_config.tables.splice(indx,1);
+            console.log('tamaño del las mesaa', this.restaurant_config.tables.length);
+            console.log(this.restaurant_config.tables.length);
+            // this.setAttribute('tables-count', this.restaurant_config.tables.lenght);
+        }
+
+      }
+      console.log(this.restaurant_config.tables);
+  });
+  }
+  attributeChangedCallback(name, oldVal, newVal) {
+    console.log(name);
+    console.log(this.getAttribute('tables-count'))
+  }
+
 }
 
 customElements.define('table-wc', Table);

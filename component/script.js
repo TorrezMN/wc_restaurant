@@ -3,12 +3,11 @@
 class Table extends HTMLElement {
   constructor() {
     super();
-
-    // console.log( Math.random().toString(36).substring(7));
     this.setAttribute('table-status', false);
     this.setAttribute('table-id', Math.random().toString(36).substring(7));
     this.attachShadow({ mode: 'open' });
     this.table_cfg = {
+      number: Math.random().toString(36).substring(3),
       occupied: false,
       table_id: this.getAttribute('table-id'),
     }
@@ -24,135 +23,86 @@ class Table extends HTMLElement {
                 />
                 </head>
                 <style>    
-                    .table-content{
-                        margin:3px;
-                        width:20vw;
-                        height:20vh;
-                        background:#6D4C41;
-                        color:#FFFFFF;
-                        border-radius:5px;
-                    }
-                    .table-botonera{
-                      width:100%;
-                      height:30%;
-                      display: flex;
-                      justify-content: center;
-                      /* align-self: center;    <---- REMOVE */
-                      align-items: center;   /* <---- NEW    */
-                      // background: silver;
-                    }
-                    .table-botonera>span{
-                      margin:5px;
-                    }
-                    .table-botonera>span>i{
-                      font-size:1.5rem;
-                      cursor:pointer;
-                    }
-                    
-                    .occupied{
-                        background:red;
-                        border-radius:50%;
-                        margin:2px;
-                        height: 26px;
-                      width: 26px;
-                    }
-                    .free{
-                        background:green;
-                        height: 26px;
-                        width: 26px;
-                        border-radius:50%;
-                        margin:2px;
-                    }
-                    /* The switch - the box around the slider */
-                    .switch {
-                      position: relative;
-                      display: inline-block;
-                      width: 60px;
-                      height: 34px;
-                    }
-                    
-                    /* Hide default HTML checkbox */
-                    .switch input {
-                      opacity: 0;
-                      width: 0;
-                      height: 0;
-                    }
-                    
-                    /* The slider */
-                    .slider {
-                      position: absolute;
-                      cursor: pointer;
-                      top: 0;
-                      left: 0;
-                      right: 0;
-                      bottom: 0;
-                      background-color: #ccc;
-                      -webkit-transition: .4s;
-                      transition: .4s;
-                    }
-                    
-                    .slider:before {
-                      position: absolute;
-                      content: "";
-                      height: 26px;
-                      width: 26px;
-                      left: 4px;
-                      bottom: 4px;
-                      background-color: white;
-                      -webkit-transition: .4s;
-                      transition: .4s;
-                    }
-                    
-                    input:checked + .slider {
-                      background-color: #2196F3;
-                    }
-                    
-                    input:focus + .slider {
-                      box-shadow: 0 0 1px #2196F3;
-                    }
-                    
-                    input:checked + .slider:before {
-                      -webkit-transform: translateX(26px);
-                      -ms-transform: translateX(26px);
-                      transform: translateX(26px);
-                    }
-                    
-                    /* Rounded sliders */
-                    .slider.round {
-                      border-radius: 34px;
-                    }
-                    
-                    .slider.round:before {
-                      border-radius: 50%;
-                    } 
+                  .table-content{
+                    background:#000000;
+                    color:#FFFFFF;
+                    padding:5px;
+                    display:flex;
+                    flex-direction:row;
+                    align-items:center;
+                    width:50vw;
+                    height:5vh;
+                    border: 1px solid #FFFFFF;
+                    border-radius:5px;
+
+                  }
+                  .table-n{
+                    width:20%;
+                    background:blue;
+                    text-align:center;
+                  }
+                  .table-status{
+                    width:50%;
+                  }
+                  .table-actions{
+                    width:30%;
+                    background:orange;
+                    text-align:right;
+                    padding:5px;
+                    display:flex;
+                    flex-direction:row;
+                  }
+                  .table-actions>i{
+                    margin:5px;
+                  }
+                  /* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
                 </style>
                 <div class="table-content">
-                    <div class="table-botonera">
-                        <span id="table-status" class="${(this.table_cfg.occupied == true) ? 'occupied' : 'free'}"></span>
-                        <!-- Rounded switch -->
-                        <label class="switch">
-                          <input type="checkbox" id="change_table_status">
-                          <span class="slider round"></span>
-                        </label>
-                        <span>
-                          <i class="fa fa-search" aria-hidden="true"></i>
-                          <i class="fa fa-trash" aria-hidden="true"></i>
-                        </span>
+                  <div class="table-n">${parseInt(Math.random()*10,10)}</div>
+                  <div class="table-status">
+                  <marquee>${this.table_cfg.occupied!=true? 'Ocupado':'Libre'}</marquee>
+                  </div>
+                  <div class="table-actions">
+                    <div class="tooltip"><i class="fa fa-ticket"></i>
+                      <span class="tooltiptext">Reservar</span>
                     </div>
+                    <i class="fa fa-user"></i>
+                    <i class="fa fa-plus"></i>
+                    <i class="fa fa-list-alt"></i>
+                    <i class="fa fa-cogs"></i>
+                  </div>                    
                 </div>
             `;
     this.shadowRoot.appendChild(this.template.content.cloneNode(true));
 
-    this.table_events = {
-      'close_table': new CustomEvent("close_table", {
-        bubbles: true,
-        cancelable: false,
-        composed: true,
-        detail: {
-          'table_id': this.table_cfg.table_id,
-        }
-      })
-    }
+
 
 
   }
@@ -162,22 +112,6 @@ class Table extends HTMLElement {
   }
   connectedCallback() {
 
-    this.shadowRoot.querySelector("#change_table_status").addEventListener('click', (ev) => {
-      this.table_cfg.occupied = !this.table_cfg.occupied;
-
-      this.shadowRoot.querySelector("#table-status").className = (this.table_cfg.occupied == true) ? 'occupied' : 'free';
-
-
-    })
-    this.shadowRoot.querySelector(".fa-trash").addEventListener('click', (ev) => {
-      console.log("CLICK EN TRASH ICON!");
-      // console.log(this.getAttribute('table-id'))
-      // Emitir el evento.
-      this.dispatchEvent(this.table_events.close_table);
-
-
-    })
-
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -190,124 +124,4 @@ class Table extends HTMLElement {
 
 
 
-
-class Restaurant extends HTMLElement {
-  constructor() {
-    super();
-    this.restaurant_config = {
-      'tables': [],
-
-    }
-    this.attachShadow({ mode: 'open' });
-    this.template = document.createElement('template');
-    this.template.innerHTML = `
-    <head>
-    <!-- Awesome Fonts -->
-    <link
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-      rel="stylesheet"
-      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-      crossorigin="anonymous"
-    />
-    </head>
-                <style>    
-                .restaurant-container{
-                    display:flex;
-                    flex-direction:row;
-
-                }
-                .botonera1{
-                    width:20%;
-                    background:red;
-                    display:flex;
-                    flex-direction:column;
-                    padding:5px;
-                    cursor: pointer;
-
-                  }
-                  .botonera_item{
-                  padding:35px;
-
-                }
-                .botonera_item:hover{
-                  background:black;
-                  color:white;
-                }
-                .content{
-                    display:flex;
-                    flex-direction:row;
-                    flex-wrap:wrap;
-                    background:orange;
-                }
-                </style>
-                <div class="restaurant-container">
-                    <div class="botonera1">
-                      <div class="botonera_item" id="nueva_mesa">
-                        <i class="fa fa-plus"></i> <span class="item_title">Nueva Mesa</span>
-                      </div>
-                      <div class="botonera_item">
-                        <i class="fa fa-users"></i> <span class="item_title">Meseros</span>
-                      </div>
-                      <div class="botonera_item">
-                        <i class="fa fa-table"></i> <span class="item_title">Mesas</span>
-                      </div>
-                    </div>
-                    <div class="content">
-
-               
-                    </div>
-                    
-                </div>
-
-
-            </div>
-            `;
-            this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-    this.test_tables();
-  }
-
-  static get observedAttributes() {
-    return ['tables-count'];
-  }
-  test_tables() {
-    for (let i of [...Array(parseInt(this.getAttribute('tables-count'), 10)).keys()]) {
-      this.restaurant_config.tables.push(new Table());
-    }
-  }
-
-  render() {
-    // this.shadowRoot.querySelector('.botonera1').innerHTML ='';
-    this.shadowRoot.querySelector('.content').innerHTML = '';
-    for (let i of this.restaurant_config.tables) {
-      this.shadowRoot.querySelector('.content').appendChild(i);
-
-    }
-
-  }
-  connectedCallback() {
-    this.render();
-    this.shadowRoot.querySelector('#nueva_mesa').addEventListener('click', (ev) => {
-      this.restaurant_config.tables.push(new Table());
-      this.render();
-
-    })
-    this.addEventListener("close_table", function (e) {
-      console.log('listend to a table event!');
-      let del_req = e.detail.table_id;
-      for (let i of this.restaurant_config.tables) {
-        if (i.getAttribute('table-id') == del_req) {
-          this.restaurant_config.tables.splice(this.restaurant_config.tables.indexOf(i), 1);
-          this.render();
-        }
-      }
-
-    });
-  }
-  attributeChangedCallback(name, oldVal, newVal) {
-
-  }
-
-}
-
-customElements.define('table-wc', Table);
-customElements.define('restaurant-wc', Restaurant);
+customElements.define('rest-table', Table);

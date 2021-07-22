@@ -2,17 +2,19 @@ class Table extends HTMLElement {
   constructor(...args) {
     super();
     let argumentos = [...args][0];
-    // SETTING ATRIBUTES
-    this.setAttribute('table-id', Math.random().toString(36).substring(7));
-    this.setAttribute('table-n', argumentos['table-nuber']);
-    this.setAttribute('is_occupied', false);
-    this.setAttribute('is_reserved', false);
-    this.setAttribute('is_reserved', false);
-    this.setAttribute('order_counts', 0);
-    this.setAttribute('titular', argumentos['table-owner']);
     this.attachShadow({ mode: 'open' });
-    
     this.template = document.createElement('template');
+    // SETTING ATRIBUTES
+    this.table_id = Math.random().toString(36).substring(7);
+    this.table_id_short = this.table_id.toString().slice(0,3);
+    this.setAttribute(`table-id-${this.table_id_short}`, this.table_id);
+    this.setAttribute(`table-n-${this.table_id_short}`, argumentos['table-nuber']);
+    this.setAttribute(`is_occupied-${this.table_id_short}`, 'no');
+    this.setAttribute(`is_reserved-${this.table_id_short}`, false);
+    this.setAttribute(`is_reserved-${this.table_id_short}`, false);
+    this.setAttribute(`order_counts-${this.table_id_short}`, 0);
+    this.setAttribute(`titular-${this.table_id_short}`, argumentos['table-owner']);
+
     this.template.innerHTML = `
                 <head>
                 <!-- Awesome Fonts -->
@@ -43,6 +45,9 @@ class Table extends HTMLElement {
                   }
                   .table-status{
                     width:50%;
+                    margin-left:5px;
+                    margin-right:5px;
+                    background: #6D4C41;
                   }
                   .table-actions{
                     width:50%;
@@ -143,9 +148,9 @@ input:checked + .slider:before {
 } 
                 </style>
                 <div class="table-content">
-                  <div class="table-n">MESA: ${this.getAttribute('table-n')}</div>
+                  <div class="table-n">MESA: ${this.getAttribute(`table-num-${this.table_id_short}`)}</div>
                   <div class="table-status">
-                  <marquee scrollamount="${Math.floor(Math.random() * 5) + 2}">${this.getAttribute('is_occupied')}</marquee>
+                  <marquee scrollamount="${Math.floor(Math.random() * 5) + 2}">${this.getAttribute(`${this.table_id_short}-is_occupied`)}</marquee>
                   </div>
                   <div class="table-actions">
                     <div class="tooltip reservar">
@@ -181,12 +186,16 @@ input:checked + .slider:before {
                 </div>
             `;
     this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+
   }
   static get observedAttributes() {
-    return [''];
+    return [
+      'is_occupied',
+      'is_reserved',
+      'is_reserved'
+    ];
   }
   connectedCallback() {
-    console.log(this.attributes)
     // Remove table.
     this.shadowRoot.querySelector('.remover-mesa').addEventListener('click', (ev) => {
       console.log('click en remover mesa!')
@@ -194,14 +203,11 @@ input:checked + .slider:before {
     })
     // Book the table.
     this.shadowRoot.querySelector('.reservar').addEventListener('click', (ev) => {
-      console.log("click en el boton reservar.")
-      this.table_cfg.is_reserved = !this.table_cfg.is_reserved;
+
       this.shadowRoot.querySelector('.switch').style.visibility = 'hidden';
       this.shadowRoot.querySelector('.reservar').style.visibility = 'hidden';
       this.shadowRoot.querySelector('.cancelar-reservar').style.visibility = 'visible';
-      this.shadowRoot.querySelector('.table-status').innerHTML = `
-      <marquee scrollamount="${Math.floor(Math.random() * 5) + 2}"> Reservado </marquee>
-      `;
+
     })
     // Cancel booking.
     this.shadowRoot.querySelector('.cancelar-reservar').addEventListener('click', (ev) => {
@@ -214,26 +220,25 @@ input:checked + .slider:before {
     })
     // If you change the state of the table.
     this.shadowRoot.querySelector("#table-status-chager").addEventListener('click', (ev) => {
-      console.log("cambio el estado____________________");
-      this.table_cfg.is_occupied = !this.table_cfg.is_occupied;
-      console.log(this.table_cfg.is_occupied);
-      console.log("cambio el estado____________________");
-      // console.log("cambio el estado", this.table_cfg.is_occupied);
-
-
-      this.update_marquee();
+      let status = this.getAttribute('is_occupied')==='no'? 'si':'no';
+      this.setAttribute('is_occupied',status);
+      
     })
   }
-  update_marquee() {
-    let marq = `<marquee scrollamount="${Math.floor(Math.random() * 5) + 2}">${this.table_cfg.is_occupied}</marquee>`;
-    this.shadowRoot.querySelector('.table-status').innerHTML = '';
-    this.shadowRoot.querySelector('.table-status').innerHTML = marq;
 
-  }
   attributeChangedCallback(name, oldVal, newVal) {
+    switch (name) {
+      case 'is_occupied':
+        console.log("estado cambio!");
+        this.shadowRoot.querySelector('.table-status').innerHTML = `<marquee scrollamount="${Math.floor(Math.random() * 5) + 2}">${this.getAttribute('is_occupied')}</marquee>`;
+        break;
+
+      default:
+        break;
+    }
   }
-  
-  
+
+
 }
 class Restaurant extends HTMLElement {
   constructor() {
@@ -359,6 +364,8 @@ class Restaurant extends HTMLElement {
     this.shadowRoot.querySelector('#add_new_table').addEventListener('click', (ev) => {
       // When the user clicks on the button, open the modal
       modal.style.display = "block";
+      // Focus in input field.
+      this.shadowRoot.querySelector('#table-owner').focus();
       // When the user clicks on <span> (x), close the modal
       span.onclick = function () {
         modal.style.display = "none";
@@ -373,6 +380,7 @@ class Restaurant extends HTMLElement {
 
     })
     this.shadowRoot.querySelector('#btn_crear_mesa').addEventListener('click', (ev) => {
+
       // console.log("TABLES CONT : ", this.rest_cfg.tables.length);
       let table_configuration = {
         'table-nuber': this.shadowRoot.querySelector('#table-number').value,

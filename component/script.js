@@ -21,7 +21,7 @@ class Table extends HTMLElement {
                 <style>
                 .table-container {
                   background: #01A4E8;
-                  width: 80vw;
+                  width: 90vw;
                   height: 10vh;
                   display: flex;
                   flex-direction: row;
@@ -39,7 +39,7 @@ class Table extends HTMLElement {
                 }
                 .table-status {
                   background: #f44336;
-                  width: 50%;
+                  width: 40%;
                   height: 100%;
                   padding: 0 5px 0 5px;
                   display: flex;
@@ -50,7 +50,7 @@ class Table extends HTMLElement {
                 }
                 .table-actions {
                   background: #000000;
-                  width: 35%;
+                  width: 40%;
                   height: 100%;
                   display: flex;
                   flex-direction: row;
@@ -222,4 +222,129 @@ class Table extends HTMLElement {
   attributeChangedCallback(name, oldVal, newVal) {
   }
 }
+class Resto extends HTMLElement {
+  constructor() {
+    super();
+    this._root = this.attachShadow({ mode: 'closed' });
+    this.template = document.createElement('template');
+    // Table configuration.
+    this.resto_cfg = {};
+    this.marquee_msg = 'MESA LIBRE';
+    // SETTING ATRIBUTES
+    this.template.innerHTML = ` 
+    <head>
+    <!-- Awesome Fonts -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    </head>
+    <style media='screen'>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .container{
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items:center;
+    }
+    .menu_container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    /* Mesas Container */
+    .mesas_container{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items:center;
+      width: 100%;
+      height: 100%;
+      background: #ff9800;
+      margin-top: 1rem;
+    }
+    .mesas_stats{
+      width: 100%;
+      height: 10vh;
+      background: #9C27B0;
+      color: whitesmoke;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+    .tooltip>i {
+      color: #FB8C00;
+      font-size: 1rem;
+      /* padding:20px; */
+    }
+    /* Tooltip container */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin: .2rem;
+      padding: .5rem;
+      width: 50%;
+      height: 5%;
+      background: #d32f2f;
+      text-align: center;
+    }
+    /* Tooltip text */
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: black;
+      color: #fff;
+      text-align: center;
+      padding: 5px 0;
+      border-radius: 6px;
+      /* Position the tooltip text - see examples below! */
+      position: absolute;
+      z-index: 1;
+    }
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+    }
+  </style>
+  <div class="container">
+  <div class="menu_container">
+    <div class="tooltip">
+      <i class="fa fa-plus-circle"></i>
+      <span class="tooltiptext">Nueva Mesa</span>
+    </div>
+    <div class="tooltip">
+      <i class="fa fa-list-alt"></i>
+      <span class="tooltiptext">Listar Mesas</span>
+    </div>
+    <div class="tooltip">
+      <i class="fa fa-list-ol"></i>
+      <span class="tooltiptext">Listar Ordenes</span>
+    </div>
+  </div>
+  <div class="mesas_container">
+    <div class="mesas_stats">
+      <span class="stats" id="total">Total</span>
+    </div>
+    <div class="measas">
+    </div>
+  </div>  
+</div>
+            `;
+    this._root.appendChild(this.template.content.cloneNode(true));
+  }
+  static get observedAttributes() {
+    return [''];
+  }
+  connectedCallback() { }
+}
+// COMPONENTS
 customElements.define('rest-table', Table);
+customElements.define('rest-cont', Resto);

@@ -228,7 +228,9 @@ class Resto extends HTMLElement {
     this._root = this.attachShadow({ mode: 'closed' });
     this.template = document.createElement('template');
     // Table configuration.
-    this.resto_cfg = {};
+    this.resto_cfg = {
+      'tables': [],
+    };
     this.marquee_msg = 'MESA LIBRE';
     // SETTING ATRIBUTES
     this.template.innerHTML = ` 
@@ -258,6 +260,7 @@ class Resto extends HTMLElement {
       justify-content: center;
       align-items: center;
       margin-top: 1rem;
+      // position:fixed;
     }
     /* Mesas Container */
     .mesas_container{
@@ -287,6 +290,7 @@ class Resto extends HTMLElement {
     }
     /* Tooltip container */
     .tooltip {
+      cursor:pointer;
       position: relative;
       display: inline-block;
       margin: .2rem;
@@ -316,7 +320,7 @@ class Resto extends HTMLElement {
   </style>
   <div class="container">
   <div class="menu_container">
-    <div class="tooltip">
+    <div class="tooltip" id="new_table">
       <i class="fa fa-plus-circle"></i>
       <span class="tooltiptext">Nueva Mesa</span>
     </div>
@@ -331,9 +335,9 @@ class Resto extends HTMLElement {
   </div>
   <div class="mesas_container">
     <div class="mesas_stats">
-      <span class="stats" id="total">Total</span>
+      <span class="stats" id="title_total">Total</span>
     </div>
-    <div class="measas">
+    <div class="mesas">
     </div>
   </div>  
 </div>
@@ -343,7 +347,25 @@ class Resto extends HTMLElement {
   static get observedAttributes() {
     return [''];
   }
-  connectedCallback() { }
+  update_title(){
+    this._root.querySelector('#title_total').innerHTML = '';
+    this._root.querySelector('#title_total').innerHTML = `Total Mesas: ${this.resto_cfg.tables.length}`;
+
+  }
+  render(){
+    this._root.querySelector('.mesas').innerHTML = '';
+    for(let i of this.resto_cfg.tables){
+      this._root.querySelector('.mesas').appendChild(i);
+    }
+  }
+  connectedCallback() {
+    this._root.querySelector('#new_table').addEventListener('click',(ev)=>{
+      this.resto_cfg.tables.push(new Table());
+      // Update title and render tables.
+      this.update_title();
+      this.render();
+    })
+   }
 }
 // COMPONENTS
 customElements.define('rest-table', Table);

@@ -155,6 +155,17 @@ class Table extends HTMLElement {
             `;
     // this.shadowRoot.appendChild(this.template.content.cloneNode(true));
     this._root.appendChild(this.template.content.cloneNode(true));
+    // EVENTS
+    this.events = {
+      mesa_eliminada : new CustomEvent("message", {
+        detail: {
+          from: "Manz",
+          message: "Hello!"
+        },
+        bubbles: false,
+        composed: true
+      }),
+    }
   }
   static get observedAttributes() {
     return [''];
@@ -217,6 +228,7 @@ class Table extends HTMLElement {
     // Remove aggregate table.
     this._root.querySelector('#table-delete-table').addEventListener('click', (ev) => {
       this.remove();
+      console.log('EVENT FIRED:', this.events.mesa_eliminada);
     })
   }
   attributeChangedCallback(name, oldVal, newVal) {
@@ -260,6 +272,8 @@ class Resto extends HTMLElement {
       justify-content: center;
       align-items: center;
       margin-top: 1rem;
+      height: 80vh;
+      background:#F06292;
       // position:fixed;
     }
     /* Mesas Container */
@@ -273,6 +287,7 @@ class Resto extends HTMLElement {
       background: #ff9800;
       margin-top: 1rem;
     }
+     
     .mesas_stats{
       width: 100%;
       height: 10vh;
@@ -296,7 +311,7 @@ class Resto extends HTMLElement {
       margin: .2rem;
       padding: .5rem;
       width: 50%;
-      height: 5%;
+      height: 3%;
       background: #d32f2f;
       text-align: center;
     }
@@ -365,6 +380,10 @@ class Resto extends HTMLElement {
       this.update_title();
       this.render();
     })
+    this._root.addEventListener('message' , (ev)=>{
+      console.log("MESA ELIMINADA!");
+      console.log(ev);
+    });
    }
 }
 // COMPONENTS

@@ -2,11 +2,11 @@ class Table extends HTMLElement {
   constructor() {
     super();
     // this.attachShadow({ mode: 'open' });
-    this._root = this.attachShadow({ mode: 'closed' });
-    this.template = document.createElement('template');
+    this._root = this.attachShadow({ mode: "open" });
+    this.template = document.createElement("template");
     // Table configuration.
     this.table_cfg = {};
-    this.marquee_msg = 'MESA LIBRE';
+    this.marquee_msg = "MESA LIBRE";
     // SETTING ATRIBUTES
     this.template.innerHTML = `
                 <head>
@@ -38,7 +38,8 @@ class Table extends HTMLElement {
                   align-items: left;
                 }
                 .table-status {
-                  background: #f44336;
+                  // background: #f44336;
+                  background:green;
                   width: 40%;
                   height: 100%;
                   padding: 0 5px 0 5px;
@@ -136,7 +137,9 @@ class Table extends HTMLElement {
                   <span>Lillian Walker</span>
                 </div>
                 <div class="table-status">
-                  <marquee id="marquee-msg" scrollamount="${Math.floor(Math.random() * 5) + 1}">${this.marquee_msg}</marquee>
+                  <marquee id="marquee-msg" scrollamount="${
+                    Math.floor(Math.random() * 5) + 1
+                  }">${this.marquee_msg}</marquee>
                 </div>
                 <div class="table-actions">
                   <i id="table-config" class="fa fa-cogs"></i>
@@ -157,32 +160,36 @@ class Table extends HTMLElement {
     this._root.appendChild(this.template.content.cloneNode(true));
     // EVENTS
     this.events = {
-      mesa_eliminada : new CustomEvent("message", {
+      mesa_eliminada: new CustomEvent("message", {
         detail: {
           from: "Manz",
-          message: "Hello!"
+          message: "Hello!",
         },
-        bubbles: false,
-        composed: true
+        bubbles: true,
+        composed: true,
       }),
-    }
+    };
   }
   static get observedAttributes() {
-    return [''];
+    return [""];
   }
   update_marquee(msg) {
     switch (msg) {
-      case 'reservado':
+      case "reservado":
         // this.shadowRoot.querySelector('#marquee-msg').innerHTML = 'Mesa Reservada';
-        this._root.querySelector('#marquee-msg').innerHTML = 'MESA RESERVADA';
+        this._root.querySelector("#marquee-msg").innerHTML = "MESA RESERVADA";
+        this._root.querySelector(".table-status").style.background = "#CCCC00";
+
         break;
-      case 'ocupado':
+      case "ocupado":
         // this.shadowRoot.querySelector('#marquee-msg').innerHTML = 'Mesa Ocupada';
-        this._root.querySelector('#marquee-msg').innerHTML = 'MESA OCUPADA';
+        this._root.querySelector("#marquee-msg").innerHTML = "MESA OCUPADA";
+        this._root.querySelector(".table-status").style.background = "#FF4500";
         break;
-      case 'libre':
+      case "libre":
         // this.shadowRoot.querySelector('#marquee-msg').innerHTML = 'Mesa Libre';
-        this._root.querySelector('#marquee-msg').innerHTML = 'MESA LIBRE';
+        this._root.querySelector("#marquee-msg").innerHTML = "MESA LIBRE";
+        this._root.querySelector(".table-status").style.background = "#2E8B57";
         break;
       default:
         break;
@@ -190,60 +197,72 @@ class Table extends HTMLElement {
   }
   connectedCallback() {
     // If you click on the Cancel Reservation button.
-    this._root.querySelector("#table-cancel-booking").addEventListener('click', (ev) => {
-      // Remove the red color.
-      this._root.querySelector("#table-cancel-booking").style.color = '#FFFFFF';
-      // Show the button to reserve.
-      this._root.querySelector("#table-reserve").style.visibility = "visible";
-      // Show the switch.
-      this._root.querySelector('.switch').style.visibility = "visible";
-      this.update_marquee('libre');
-    })
-    // If you click on the Book button.
-    this._root.querySelector("#table-reserve").addEventListener('click', (ev) => {
-      // Hide this button.
-      this._root.querySelector("#table-reserve").style.visibility = "hidden";
-      // Hide the slider.
-      this._root.querySelector('.switch').style.visibility = "hidden";
-      // Put red the cancel reserve button.
-      this._root.querySelector('#table-cancel-booking').style.color = 'red';
-      this.update_marquee('reservado');
-    })
-    this._root.querySelector('#table-status-changer').addEventListener('change', (ev) => {
-      // Control events with the slider.
-      if (this._root.querySelector('#table-status-changer').checked) {
-        console.log("ESTA EN ON")
-        // Hide button for reservation and cancel reservation.
-        this._root.querySelector("#table-reserve").style.visibility = "hidden";
-        this._root.querySelector("#table-cancel-booking").style.visibility = "hidden";
-        this.update_marquee('ocupado');
-      } else {
-        console.log("ESTA EN OFF")
-        // Put visible the BOOK and Cancel Reservation buttons.
+    this._root
+      .querySelector("#table-cancel-booking")
+      .addEventListener("click", (ev) => {
+        // Remove the red color.
+        this._root.querySelector("#table-cancel-booking").style.color =
+          "#FFFFFF";
+        // Show the button to reserve.
         this._root.querySelector("#table-reserve").style.visibility = "visible";
-        this._root.querySelector("#table-cancel-booking").style.visibility = "visible";
-        this.update_marquee('libre');
-      }
-    })
+        // Show the switch.
+        this._root.querySelector(".switch").style.visibility = "visible";
+        this.update_marquee("libre");
+      });
+    // If you click on the Book button.
+    this._root
+      .querySelector("#table-reserve")
+      .addEventListener("click", (ev) => {
+        // Hide this button.
+        this._root.querySelector("#table-reserve").style.visibility = "hidden";
+        // Hide the slider.
+        this._root.querySelector(".switch").style.visibility = "hidden";
+        // Put red the cancel reserve button.
+        this._root.querySelector("#table-cancel-booking").style.color = "red";
+        this.update_marquee("reservado");
+      });
+    this._root
+      .querySelector("#table-status-changer")
+      .addEventListener("change", (ev) => {
+        // Control events with the slider.
+        if (this._root.querySelector("#table-status-changer").checked) {
+          // console.log("ESTA EN ON")
+          // Hide button for reservation and cancel reservation.
+          this._root.querySelector("#table-reserve").style.visibility =
+            "hidden";
+          this._root.querySelector("#table-cancel-booking").style.visibility =
+            "hidden";
+          this.update_marquee("ocupado");
+        } else {
+          // console.log("ESTA EN OFF")
+          // Put visible the BOOK and Cancel Reservation buttons.
+          this._root.querySelector("#table-reserve").style.visibility =
+            "visible";
+          this._root.querySelector("#table-cancel-booking").style.visibility =
+            "visible";
+          this.update_marquee("libre");
+        }
+      });
     // Remove aggregate table.
-    this._root.querySelector('#table-delete-table').addEventListener('click', (ev) => {
-      this.remove();
-      console.log('EVENT FIRED:', this.events.mesa_eliminada);
-    })
+    this._root
+      .querySelector("#table-delete-table")
+      .addEventListener("click", (ev) => {
+        // Deletes current item.
+        this.remove();
+      });
   }
-  attributeChangedCallback(name, oldVal, newVal) {
-  }
+  attributeChangedCallback(name, oldVal, newVal) {}
 }
 class Resto extends HTMLElement {
   constructor() {
     super();
-    this._root = this.attachShadow({ mode: 'closed' });
-    this.template = document.createElement('template');
+    this._root = this.attachShadow({ mode: "open" });
+    this.template = document.createElement("template");
     // Table configuration.
     this.resto_cfg = {
-      'tables': [],
+      tables: [],
     };
-    this.marquee_msg = 'MESA LIBRE';
+    this.marquee_msg = "MESA LIBRE";
     // SETTING ATRIBUTES
     this.template.innerHTML = ` 
     <head>
@@ -360,32 +379,36 @@ class Resto extends HTMLElement {
     this._root.appendChild(this.template.content.cloneNode(true));
   }
   static get observedAttributes() {
-    return [''];
+    return [""];
   }
-  update_title(){
-    this._root.querySelector('#title_total').innerHTML = '';
-    this._root.querySelector('#title_total').innerHTML = `Total Mesas: ${this.resto_cfg.tables.length}`;
-
+  update_title() {
+    this._root.querySelector("#title_total").innerHTML = "";
+    this._root.querySelector(
+      "#title_total"
+    ).innerHTML = `Total Mesas: ${this.resto_cfg.tables.length}`;
   }
-  render(){
-    this._root.querySelector('.mesas').innerHTML = '';
-    for(let i of this.resto_cfg.tables){
-      this._root.querySelector('.mesas').appendChild(i);
+  render() {
+    this._root.querySelector(".mesas").innerHTML = "";
+    for (let i of this.resto_cfg.tables) {
+      this._root.querySelector(".mesas").appendChild(i);
     }
   }
   connectedCallback() {
-    this._root.querySelector('#new_table').addEventListener('click',(ev)=>{
+    this._root.querySelector("#new_table").addEventListener("click", (ev) => {
       this.resto_cfg.tables.push(new Table());
       // Update title and render tables.
       this.update_title();
       this.render();
-    })
-    this._root.addEventListener('message' , (ev)=>{
-      console.log("MESA ELIMINADA!");
-      console.log(ev);
     });
-   }
+
+    this._root.addEventListener("check", (ev) => {
+      alert("check event listened!");
+    });
+    this._root.addEventListener("message", (ev) => {
+      alert("Test event fired!");
+    });
+  }
 }
 // COMPONENTS
-customElements.define('rest-table', Table);
-customElements.define('rest-cont', Resto);
+customElements.define("rest-table", Table);
+customElements.define("rest-cont", Resto);
